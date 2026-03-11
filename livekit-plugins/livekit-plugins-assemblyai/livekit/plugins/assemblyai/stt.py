@@ -110,6 +110,7 @@ class STT(stt.STT):
             capabilities=stt.STTCapabilities(
                 streaming=True,
                 interim_results=True,
+                diarization=speaker_labels if is_given(speaker_labels) else False,
                 aligned_transcript="word",
                 offline_recognize=False,
             ),
@@ -499,6 +500,8 @@ class SpeechStream(stt.SpeechStream):
         utterance = data.get("utterance", "")
         transcript = data.get("transcript", "")
         language = LanguageCode(data.get("language_code", "en"))
+        speaker_label = data.get("speaker_label")
+        speaker_id = speaker_label if speaker_label and speaker_label != "UNKNOWN" else None
 
         # transcript (final) and words (interim) are cumulative
         # utterance (preflight) is chunk based
@@ -535,6 +538,7 @@ class SpeechStream(stt.SpeechStream):
                         end_time=end_time,
                         words=timed_words,
                         confidence=confidence,
+                        speaker_id=speaker_id,
                     )
                 ],
             )
@@ -565,6 +569,7 @@ class SpeechStream(stt.SpeechStream):
                         end_time=end_time,
                         words=utterance_words,
                         confidence=utterance_confidence,
+                        speaker_id=speaker_id,
                     )
                 ],
             )
@@ -584,6 +589,7 @@ class SpeechStream(stt.SpeechStream):
                         end_time=end_time,
                         words=timed_words,
                         confidence=confidence,
+                        speaker_id=speaker_id,
                     )
                 ],
             )
